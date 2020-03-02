@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -23,11 +19,16 @@ namespace API
                 var services = scope.ServiceProvider;
                 try
                 {
+                    // get the context
                     var context = services.GetRequiredService<DataContext>();
+                    // automatically migrate/create the database
                     context.Database.Migrate();
+                    // seed the database with dummy information
+                    Seed.SeedData(context);
                 }
                 catch (Exception ex)
                 {
+                    // if something goes wrong, log the error
                     var logger = services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(ex, "An error occured during migration");
                 }
