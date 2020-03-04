@@ -9,7 +9,6 @@ import ActivityForm from "../../features/activities/form/ActivityForm";
 import ActivityDetails from "../../features/activities/details/ActivityDetails";
 
 const App: React.FC<RouteComponentProps> = ({ location }) => {
-
     return (
         <Fragment>
             <Route exact path="/" component={HomePage} />
@@ -18,6 +17,7 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
                 path={"/(.+)"}
                 render={() => (
                     <Fragment>
+                        <NavBar />
                         <Container style={{ marginTop: "7em" }}>
                             <Route
                                 exact
@@ -37,7 +37,6 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
                     </Fragment>
                 )}
             />
-            <NavBar />
         </Fragment>
     );
 };
