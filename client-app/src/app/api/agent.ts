@@ -1,7 +1,36 @@
 import axios, { AxiosResponse } from "axios";
 import { IActivity } from "../Models/activity";
+import { history } from "../..";
+import { toast } from "react-toastify";
 
 axios.defaults.baseURL = "http://localhost:5000/api";
+
+axios.interceptors.response.use(undefined, error => {
+    // if there is a network error         (or the respone undefined)
+    if (error.message === "Network Error" && !error.response) {
+        toast.error("Network error - make sure API is running!");
+    }
+
+    const { status, data, config } = error.response;
+
+    // if there is an error, push the user to not found page
+    // if the data is not found
+    if (status === 404) {
+        history.push("/notfound");
+    }
+    // if the request is bad or wrong type
+    if (
+        status === 400 &&
+        config.method === "get" &&
+        data.errors.hasOwnProperty("id")
+    ) {
+        history.push("/notfound");
+    }
+    // if the error is from the server
+    if (status === 500) {
+        toast.error("Server error - check the terminal for more info!");
+    }
+});
 
 const responseBody = (response: AxiosResponse) => response.data;
 
@@ -11,10 +40,26 @@ const sleep = (ms: number) => (response: AxiosResponse) =>
     );
 
 const requests = {
-    get: (url: string) => axios.get(url).then(sleep(1000)).then(responseBody),
-    post: (url: string, body: {}) => axios.post(url, body).then(sleep(1000)).then(responseBody),
-    put: (url: string, body: {}) => axios.put(url, body).then(sleep(1000)).then(responseBody),
-    delete: (url: string) => axios.delete(url).then(sleep(1000)).then(responseBody)
+    get: (url: string) =>
+        axios
+            .get(url)
+            .then(sleep(1000))
+            .then(responseBody),
+    post: (url: string, body: {}) =>
+        axios
+            .post(url, body)
+            .then(sleep(1000))
+            .then(responseBody),
+    put: (url: string, body: {}) =>
+        axios
+            .put(url, body)
+            .then(sleep(1000))
+            .then(responseBody),
+    delete: (url: string) =>
+        axios
+            .delete(url)
+            .then(sleep(1000))
+            .then(responseBody)
 };
 
 const Activities = {
